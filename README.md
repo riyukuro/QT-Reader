@@ -11,7 +11,7 @@ WIP PySide6 QT LN/WN Reader: Currently Unusable.
 - [ ] Setup Downloading & Installing Sources from the repository
 - [ ] Reader Settings (Background color, Text color, text size, text font, etc.)
 - [ ] Download chapters (.html or .txt files more; maybe epubs later on)
-- [ ] Add Top Bar (For search mainly)
+- [ x ] ~~Add Top Bar (For search)~~
 - [ ] Hideable side bar (Used for when in the reader; maybe automatic)
 - [ ] Name for the reader (QT-Reader/LNReader won't be the name forever)
 
