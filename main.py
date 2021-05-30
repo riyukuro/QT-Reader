@@ -14,13 +14,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = ui_main.Ui_MainWindow()
         self.ui.setupUi(self)
         self.show()
-        self.ui.BrowseBtn.clicked.connect(self.browse_installed_sources)
+        self.ui.browseBtn.clicked.connect(self.browse_installed_sources)
+        self.ui.topBar.hide()
+        self.ui.backBtn.clicked.connect(self.back)
 
     def browse_installed_sources(self):
+        if self.ui.backBtn.isVisible() is True: self.ui.backBtn.hide()
         """ Creates the Browse Page for installed sources. (Buttons link to the 'testing' method) """
         # Clears "dead" pages.
-        for i in range(0, self.ui.StackedWidget.count()): self.ui.StackedWidget.widget(i).deleteLater()
-
+        for i in range(0, self.ui.stackedWidget.count()): self.ui.stackedWidget.widget(i).deleteLater()
+        
         self.browse_sources_page = QtWidgets.QWidget()
         self.browse_sources_page.setObjectName(u'Browse Page')
 
@@ -103,9 +106,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.browse_ScrollArea_Layout.addWidget(self.browse_ScrollArea)
 
         # Add page to StackedWidget, changes to page & changes window title.
-        self.ui.StackedWidget.addWidget(self.browse_sources_page)
-        page = self.ui.StackedWidget.findChild(QtWidgets.QWidget,'Browse Page')
-        self.ui.StackedWidget.setCurrentIndex(self.ui.StackedWidget.indexOf(page))
+        self.ui.stackedWidget.addWidget(self.browse_sources_page)
+        page = self.ui.stackedWidget.findChild(QtWidgets.QWidget,'Browse Page')
+        self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(page))
         self.setWindowTitle('Browse')
 
     def testing(self): # TODO Rename Method, Add Search, Check for performance issues.
@@ -143,9 +146,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.browse_library_scrollArea.setWidget(self.widget)
         self.browse_library_layout.addWidget(self.browse_library_scrollArea)
 
-        self.ui.StackedWidget.addWidget(self.browse_library_page)
-        page = self.ui.StackedWidget.findChild(QtWidgets.QWidget,'Library Page')
-        self.ui.StackedWidget.setCurrentIndex(self.ui.StackedWidget.indexOf(page))
+        self.ui.stackedWidget.addWidget(self.browse_library_page)
+        page = self.ui.stackedWidget.findChild(QtWidgets.QWidget,'Library Page')
+        self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(page))
         
         import textwrap as tw
         for i in data:
@@ -166,6 +169,8 @@ class MainWindow(QtWidgets.QMainWindow):
             generated_cover.clicked.connect(self.novel_info)
             layout.addWidget(generated_cover)
 
+        if self.ui.backBtn.isVisible() is False: self.ui.backBtn.show()
+
     def novel_info(self):
         """ Creates the Info page for the Novel. (Cover, Title, Description & Chapter List) """
         source = self.sender().property('source')
@@ -179,7 +184,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.info_vertical_layout.setContentsMargins(0, 0, 0, 0)
         self.info_vertical_layout.setSpacing(0)
 
-        self.info_pane_layout = QtWidgets.QGridLayout()
+        self.info_pane_frame = QtWidgets.QFrame()
+        self.info_pane_frame.setMaximumSize(16777215, 300)
+
+        self.info_pane_layout = QtWidgets.QGridLayout(self.info_pane_frame)
         self.info_pane_layout.setSpacing(0)
 
         if len(self.info_data[0]['cover']) > 1:
@@ -213,7 +221,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.info_pane_layout.addWidget(self.bookmark, 0, 2, 1, 1)
 
-        self.info_vertical_layout.addLayout(self.info_pane_layout)
+        self.info_vertical_layout.addWidget(self.info_pane_frame)
 
         self.chapter_scroll = QtWidgets.QScrollArea(self.info_page)
         self.chapter_scroll.setWidgetResizable(True)
@@ -225,7 +233,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.chapter_scroll_layout.setSpacing(0)
         button_num = 0
         for i in self.info_data[1]:
-            button_num += 1
             self.chapter = QtWidgets.QPushButton()
             self.chapter.setText(i['title'])
             self.chapter.setObjectName(str(button_num))
@@ -233,15 +240,18 @@ class MainWindow(QtWidgets.QMainWindow):
             self.chapter.setProperty('source', source)
             self.chapter.clicked.connect(self.novel_reader)
             self.chapter_scroll_layout.addWidget(self.chapter)
+            button_num += 1
 
         self.chapter_scroll.setWidget(self.chapter_scroll_contents)
         
         self.info_vertical_layout.addWidget(self.chapter_scroll)
 
-        self.ui.StackedWidget.addWidget(self.info_page)
-        page = self.ui.StackedWidget.findChild(QtWidgets.QWidget,'Info Page')
-        self.ui.StackedWidget.setCurrentIndex(self.ui.StackedWidget.indexOf(page))
+        if self.ui.backBtn.isVisible() is False: self.ui.backBtn.show()
 
+        self.ui.stackedWidget.addWidget(self.info_page)
+        page = self.ui.stackedWidget.findChild(QtWidgets.QWidget,'Info Page')
+        self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(page))
+        
     def novel_reader(self):
         source_name = self.sender().property('source')
         source = import_module('sources.' + source_name)
@@ -251,7 +261,7 @@ class MainWindow(QtWidgets.QMainWindow):
         contents = source.fetch_chapter_contents(url)
 
         self.novel_reader_page = QtWidgets.QWidget()
-        self.novel_reader_page.setObjectName('Reader')
+        self.novel_reader_page.setObjectName('Reader Page')
 
         self.page_layout = QtWidgets.QVBoxLayout(self.novel_reader_page)
         self.page_layout.setContentsMargins(0,0,0,0)
@@ -275,25 +285,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.reader = QtWidgets.QTextBrowser()
         self.reader.setText(str(contents))
         self.page_layout.addWidget(self.reader)
+
+        if self.ui.backBtn.isVisible() is False: self.ui.backBtn.show()
         
-        self.ui.StackedWidget.addWidget(self.novel_reader_page)
-        page = self.ui.StackedWidget.findChild(QtWidgets.QWidget,'Reader')
-        self.ui.StackedWidget.setCurrentIndex(self.ui.StackedWidget.indexOf(page))
+        self.ui.stackedWidget.addWidget(self.novel_reader_page)
+        page = self.ui.stackedWidget.findChild(QtWidgets.QWidget,'Reader Page')
+        self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(page))
 
     def chap(self):
         source_name = self.sender().property('source')
         source = import_module('sources.' + source_name)
         num = int(self.sender().property('num'))
-        if num != 0:
-            if self.sender().property('direction') == 'next': 
-                num += 1
-            else: 
-                num -= 1
-            self.next.setProperty('num', str(num))
-            self.prev.setProperty('num', str(num))
+        if self.sender().property('direction') == 'next': 
+            num += 1
+        else: 
+            if num != 0: num -= 1
+        self.next.setProperty('num', str(num))
+        self.prev.setProperty('num', str(num))
         url = self.info_data[1][num]['url']
         self.reader.setText(str(source.fetch_chapter_contents(url)))
         return
+    
+    def back(self):
+        current_page = self.ui.stackedWidget.currentIndex()
+        self.ui.stackedWidget.setCurrentIndex(current_page-1)
+        self.ui.stackedWidget.widget(current_page).deleteLater()
 
 if __name__ == "__main__":
     import sys
