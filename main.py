@@ -1,4 +1,3 @@
-""" Testing Passing JSON Data Between Methods """
 import ui.ui_main as ui_main
 import ui.ui_util
 from PySide6 import QtCore, QtGui, QtWidgets
