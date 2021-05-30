@@ -5,22 +5,20 @@ header = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWe
 
 def fetch_popular(base_url):
     popular_results = list()
-    for i in range(3):
-        popular_url = base_url + f'/novel/page/{str(i)}/?m_orderby=trending'
-        popular = BeautifulSoup(requests.get(popular_url, headers=header).text, 'html.parser')
-        
-        for i in popular.select('div.page-listing-item:nth-child(n) > div > div > div'):
-            popular_results.append({'title': i.div.a['title'], 'url': i.div.a['href'], 'cover': i.div.a.img['src']})
+    popular_url = base_url + '/novel/page/1/?m_orderby=trending'
+    popular = BeautifulSoup(requests.get(popular_url, headers=header).text, 'html.parser')
+    
+    for i in popular.select('div.page-listing-item:nth-child(n) > div > div > div'):
+        popular_results.append({'title': i.div.a['title'], 'url': i.div.a['href'], 'cover': i.div.a.img['src']})
     return popular_results
 
 def fetch_latest(base_url):
-    latest_url = base_url + '/page/'
+    latest_url = base_url + '/page/1'
     latest_results = list()
-    for page in range(3):
-        latest = BeautifulSoup(requests.get(latest_url + str(page), headers=header).text, 'html.parser')
-        
-        for i in latest.select('div.page-listing-item:nth-child(n) > div > div > div'):
-            latest_results.append({'title': i.div.a['title'], 'url': i.div.a['href'], 'cover': i.div.a.img['src']})
+    latest = BeautifulSoup(requests.get(latest_url, headers=header).text, 'html.parser')
+    
+    for i in latest.select('div.page-listing-item:nth-child(n) > div > div > div'):
+        latest_results.append({'title': i.div.a['title'], 'url': i.div.a['href'], 'cover': i.div.a.img['src']})
     
     return latest_results
 
