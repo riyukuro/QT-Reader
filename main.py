@@ -15,7 +15,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.show()
         self.ui.browseBtn.clicked.connect(self.browse_installed_sources)
-        self.ui.libraryBtn.clicked.connect(self.search)
         self.ui.topBar.hide()
         self.ui.backBtn.clicked.connect(self.back)
 
