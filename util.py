@@ -1,4 +1,3 @@
-
 def generate_installed_sources():
     import os
     sources = []

@@ -15,6 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.show()
         self.ui.browseBtn.clicked.connect(self.browse_installed_sources)
+        self.ui.libraryBtn.clicked.connect(self.search)
         self.ui.topBar.hide()
         self.ui.backBtn.clicked.connect(self.back)
 
@@ -73,7 +74,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.sourceButton.setAutoRaise(True)
             self.sourceButton.setText(i['source']) 
             self.sourceButton.setObjectName(i['source'])
-            self.sourceButton.setProperty('use', 'popular')
+            self.sourceButton.setProperty('use', 'search')
             self.sourceButton.clicked.connect(self.testing)
             self.buttonsHLayout.addWidget(self.sourceButton)
 
@@ -119,8 +120,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.browse_source(source.fetch_popular(), source_name)
             self.setWindowTitle(source_name + ' Popular')
 
-        elif self.sender().property('use') == 'search': #TODO Implement Search bar
-            self.browse_source(source.fetch_search(), source_name)
+        elif self.sender().property('use') == 'search':
+            self.search(source_name)
 
         else: 
             self.browse_source(source.fetch_latest(), source_name)
@@ -320,6 +321,72 @@ class MainWindow(QtWidgets.QMainWindow):
         current_page = self.ui.stackedWidget.currentIndex()
         self.ui.stackedWidget.setCurrentIndex(current_page-1)
         self.ui.stackedWidget.widget(current_page).deleteLater()
+        if self.ui.stackedWidget.currentIndex() < 1: self.ui.backBtn.hide()
+
+    def search(self, source_name):
+        self.search_page = QtWidgets.QWidget()
+        self.search_page.setObjectName(u'Search Page')
+
+        self.search_page_layout = QtWidgets.QVBoxLayout(self.search_page)
+        self.search_page_layout.setSpacing(0)
+        self.search_page_layout.setContentsMargins(0, 0, 0, 0)
+        
+        self.searchBarFrame = QtWidgets.QFrame(self.search_page)
+        self.searchBarFrame.setMaximumHeight(50)
+        self.searchBarFrameLayout = QtWidgets.QHBoxLayout(self.searchBarFrame)
+
+        self.searchBar = QtWidgets.QLineEdit(self.searchBarFrame)
+        self.searchBarFrameLayout.addWidget(self.searchBar)
+
+        self.searchButton = QtWidgets.QPushButton()
+        self.searchButton.setText('Search')
+        self.searchButton.setShortcut('enter')
+        self.searchButton.clicked.connect(lambda: self.search_results(self.searchBar.text(), source_name))
+        self.searchBarFrameLayout.addWidget(self.searchButton, 0, QtCore.Qt.AlignLeft)
+
+        self.search_page_layout.addWidget(self.searchBarFrame)
+
+        self.searchScrollArea = QtWidgets.QScrollArea(self.search_page)
+        self.searchScrollArea.setWidgetResizable(True)
+        self.searchScrollArea.setObjectName('Search Scroll Area')
+
+        self.widget2 = QtWidgets.QWidget(self.searchScrollArea)
+        self.widget2.setMinimumHeight(50)
+        self.layout = ui.ui_util.FlowLayout(self.widget2)
+
+        self.searchScrollArea.setWidget(self.widget2)
+        self.search_page_layout.addWidget(self.searchScrollArea)
+
+        self.ui.stackedWidget.addWidget(self.search_page)
+        page = self.ui.stackedWidget.findChild(QtWidgets.QWidget,u'Search Page')
+        self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(page))
+        if self.ui.backBtn.isVisible() is False: self.ui.backBtn.show()
+
+    def search_results(self, title, source_name):
+        if self.layout.count() != 0: self.layout.__del__()
+
+        from importlib import import_module
+        source = import_module('sources.' + source_name)
+        data = source.fetch_search(str(title))
+
+        import textwrap as tw
+        for i in data:
+            generated_cover = QtWidgets.QToolButton()
+            if len(i['cover']) > 1:
+                pixmap = QtGui.QPixmap()
+                pixmap.loadFromData(get(i['cover']).content)
+            else: pixmap = QtGui.QPixmap(f'{cwd}/res/no_cover.jpg')
+            pixmap_rescale = pixmap.scaled(110, 150, QtCore.Qt.KeepAspectRatio) #120,170
+            generated_cover.setIcon(QtGui.QIcon(pixmap_rescale))
+            generated_cover.setIconSize(pixmap_rescale.rect().size())
+            generated_cover.setToolButtonStyle(QtCore.Qt.ToolButtonTextUnderIcon)
+            generated_cover.setStyleSheet('font-size: 11px;')
+            generated_cover.setText(tw.fill(i['title'], 15)) #19
+            generated_cover.setAutoRaise(True)
+            generated_cover.setProperty('url', i['url'])
+            generated_cover.setProperty('source', source_name)
+            generated_cover.clicked.connect(self.novel_info)
+            self.layout.addWidget(generated_cover)
 
 if __name__ == "__main__":
     import sys
