@@ -116,14 +116,14 @@ class MainWindow(QtWidgets.QMainWindow):
         source_name = str(self.sender().objectName())
         source = import_module('sources.' + source_name)
         if self.sender().property('use') == 'popular': 
-            self.browse_source(source.fetch_popular(), source_name)
+            self.browse_source(source.fetchPopular(), source_name)
             self.setWindowTitle(source_name + ' Popular')
 
         elif self.sender().property('use') == 'search':
             self.search(source_name)
 
         else: 
-            self.browse_source(source.fetch_latest(), source_name)
+            self.browse_source(source.fetchLatest(), source_name)
             self.setWindowTitle(source_name + ' Latest')
 
     def browse_source(self, data, source):
@@ -175,7 +175,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Creates the Info page for the Novel. (Cover, Title, Description & Chapter List) """
         source = self.sender().property('source')
         data_import = import_module('sources.' + source)
-        self.info_data = data_import.fetch_novel_details(self.sender().property('url'))
+        self.info_data = data_import.fetchDetails(self.sender().property('url'))
 
         self.info_page = QtWidgets.QWidget()
         self.info_page.setObjectName('Info Page')
@@ -258,7 +258,7 @@ class MainWindow(QtWidgets.QMainWindow):
         url = self.sender().property('url')
         chapter_num = int(self.sender().objectName())
 
-        contents = source.fetch_chapter_contents(url)
+        contents = source.fetchChapter(url)
 
         self.novel_reader_page = QtWidgets.QWidget()
         self.novel_reader_page.setObjectName('Reader Page')
@@ -313,7 +313,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.next.setProperty('num', str(num))
         self.prev.setProperty('num', str(num))
         url = self.info_data[1][num]['url']
-        self.reader.setText(str(source.fetch_chapter_contents(url)))
+        self.reader.setText(str(source.fetchChapter(url)))
         return
     
     def back(self):
@@ -366,7 +366,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         from importlib import import_module
         source = import_module('sources.' + source_name)
-        data = source.fetch_search(str(title))
+        data = source.fetchSearch(str(title))
 
         import textwrap as tw
         for i in data:

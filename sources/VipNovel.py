@@ -1,16 +1,14 @@
 from sources.lib import madara #pylint: disable=import-error
 
-base_url = 'https://boxnovel.com'
+base_url = 'https://vipnovel.com'
 
 def fetchPopular(): 
-    popular_url = base_url + '/novel/?m_orderby=trending'
-    popular_selector = 'div.col-xs-12.col-md-6'
-    return madara.fetchPopular(popular_url, popular_selector)
+    popular_url = base_url + '/vipnovel/?m_orderby=trending'
+    return madara.fetchPopular(popular_url, None)
 
 def fetchLatest(): 
     latest_url = base_url + '/?m_orderby=latest'
-    latest_selector = 'div.col-xs-12.col-md-6'
-    return madara.fetchLatest(latest_url, latest_selector)
+    return madara.fetchLatest(latest_url, None)
 
 def fetchSearch(search): 
     search_url = base_url + f'/?s={search}&post_type=wp-manga'

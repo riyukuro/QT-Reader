@@ -1,10 +1,10 @@
 def generate_installed_sources():
     import os
     sources = []
-    dir = os.getcwd() + '/sources'
+    sources_dir = os.getcwd() + '/sources'
 
-    for entry in os.listdir(dir):
+    for entry in os.listdir(sources_dir):
         if '.py' in entry:
-            x = {'source': entry.strip('.py'), 'thumbnail': dir + '/thumbnails/' + entry.replace('.py', '.png')}
+            x = {'source': entry.strip('.py'), 'thumbnail': sources_dir + '/thumbnails/' + entry.replace('.py', '.png')}
             sources.append(x)
     return sources

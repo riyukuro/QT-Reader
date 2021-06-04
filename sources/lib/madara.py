@@ -1,61 +1,92 @@
+# CMS: Madara, Version: 0.1
+
 from bs4 import BeautifulSoup
-import requests
+import requests as r
 
 header = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
 
-def fetch_popular(base_url):
+def fetchPopular(popular_url, popular_selector):
     popular_results = list()
-    popular_url = base_url + '/novel/page/1/?m_orderby=trending'
-    popular = BeautifulSoup(requests.get(popular_url, headers=header).text, 'html.parser')
+
+    try:
+        request = r.get(popular_url, headers=header)
+    except r.exceptions.RequestException as e:
+        raise SystemExit(e)
+    popular = BeautifulSoup(request.text, 'html.parser')
+
+    if popular_selector is None:
+        popular_selector = 'div.col-12.col-md-6'
     
-    for i in popular.select('div.page-listing-item:nth-child(n) > div > div > div'):
+    for i in popular.select(popular_selector):
         popular_results.append({'title': i.div.a['title'], 'url': i.div.a['href'], 'cover': i.div.a.img['src']})
+    
     return popular_results
 
-def fetch_latest(base_url):
-    latest_url = base_url + '/page/1'
+def fetchLatest(latest_url, latest_selector):
     latest_results = list()
-    latest = BeautifulSoup(requests.get(latest_url, headers=header).text, 'html.parser')
-    
-    for i in latest.select('div.page-listing-item:nth-child(n) > div > div > div'):
+
+    try:
+        request = r.get(latest_url, headers=header)
+    except r.exceptions.RequestException as e:
+        raise SystemExit(e)
+    latest = BeautifulSoup(request.text, 'html.parser')
+
+    if latest_selector is None:
+        latest_selector = 'div.col-12.col-md-6'
+
+    for i in latest.select(latest_selector):
         latest_results.append({'title': i.div.a['title'], 'url': i.div.a['href'], 'cover': i.div.a.img['src']})
-    
+
     return latest_results
 
-def fetch_search(base_url, novel_name):
-    search_url = base_url + f"/?s={novel_name}&post_type=wp-manga"
-    search = BeautifulSoup(requests.get(search_url, headers=header).text, 'html.parser')
+def fetchSearch(search_url, search_selector):
     search_results = list()
-        
+    if search_selector is None:
+        search_selector = 'div.c-tabs-item__content'
+
+    try:
+        request = r.get(search_url, headers=header)
+    except r.exceptions.RequestException as e:
+        raise SystemExit(e)
+
+    search = BeautifulSoup(request.text, 'html.parser')
+
     for i in search.select('div.c-tabs-item__content:nth-child(n)'):
         search_results.append({'title': i.div.div.a['title'], 'url': i.div.div.a['href'], 'cover': i.div.div.a.img['src']})
     return search_results
+    
+def fetchDetails(novel_url):
+    
+    try:
+        request = r.get(novel_url, headers=header)
+    except r.exceptions.RequestException as e:
+        raise SystemExit(e)
 
-def fetch_novel_details(novel_url):
-    novel = BeautifulSoup(requests.get(novel_url, headers=header).text, 'html.parser')
+    details = BeautifulSoup(request.text, 'html.parser')
+    title = details.select_one('h3').get_text().replace('NEW', '').replace('HOT', '').lstrip().rstrip()
+    cover = details.select_one('.summary_image img')['src']
+    desc = details.select_one('p').getText()
 
-    # Novel Details
+    detail_result = [{'title': title, 'cover': str(cover), 'desc': desc}]
 
-    novel_title = novel.select_one('h3').get_text().replace('NEW', '').replace('HOT', '').lstrip().rstrip()
-    novel_cover = novel.select_one('.summary_image img')['src']
-    #novel_desc = novel.select_one('#editdescription').getText()
-    novel_desc = novel.select_one('p').getText()
-    details = [{'title': novel_title, 'cover': str(novel_cover), 'desc': novel_desc}]
-
-    # Chapter List
-
-    chapter_list = novel.select('ul.main li.wp-manga-chapter a')
+    # FetchChapterList
+    chapter_list = details.select('ul.main li.wp-manga-chapter a')
     chapter_list_results = list()
 
     for i in reversed(chapter_list):
         chapter_list_results.append({'title': i.text.strip(), 'url': i['href']})
     
-    details.append(chapter_list_results)
+    detail_result.append(chapter_list_results)
 
-    return details
+    return detail_result
 
-def fetch_chapter_contents(chapter_url):
-    chapter_body = BeautifulSoup(requests.get(chapter_url, headers=header).text, 'html5lib').select_one('div.text-left').findAll('p')
+def fetchChapter(chapter_url):
+    try:
+        request = r.get(chapter_url, headers=header)
+    except r.exceptions.RequestException as e:
+        raise SystemExit(e)
+
+    chapter_body = BeautifulSoup(request.text, 'html5lib').select_one('div.text-left').findAll('p')
     chapter = ''.join(str(x) + '\n' for x in chapter_body)
 
     return chapter
