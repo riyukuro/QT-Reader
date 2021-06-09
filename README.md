@@ -1,5 +1,5 @@
 # QT-Reader
-WIP PySide6 QT LN/WN Reader: Currently Unusable.
+WIP PySide6 QT Light Novel/Web Novel Reader.
 
 # TODO:
 - [ ] Caching for network calls (ie. Covers)
