@@ -1,5 +1,7 @@
+# I no longer have any interest in working on this project so it is archived; and sources are broken.
+
 # QT-Reader
-WIP PySide6 QT Light Novel/Web Novel Reader.
+~~WIP~~ PySide6 QT Light Novel/Web Novel Reader.
 
 # TODO:
 - [ ] Caching for network calls (ie. Covers)
