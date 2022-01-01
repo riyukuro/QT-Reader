@@ -4,9 +4,9 @@ from PySide6 import QtCore, QtGui, QtWidgets
 
 from importlib import import_module
 from requests import get
-from os import getcwd
+from os import path
 
-cwd = getcwd()
+pwd = path.dirname(path.abspath(__file__))
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -157,7 +157,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if len(i['cover']) > 1:
                 pixmap = QtGui.QPixmap()
                 pixmap.loadFromData(get(i['cover']).content)
-            else: pixmap = QtGui.QPixmap(f'{cwd}/res/no_cover.jpg')
+            else: pixmap = QtGui.QPixmap(f'{pwd}/res/no_cover.jpg')
             pixmap_rescale = pixmap.scaled(110, 150, QtCore.Qt.KeepAspectRatio) #120,170
             generated_cover.setIcon(QtGui.QIcon(pixmap_rescale))
             generated_cover.setIconSize(pixmap_rescale.rect().size())
@@ -194,7 +194,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if len(self.info_data[0]['cover']) > 1:
             pixmap = QtGui.QPixmap()
             pixmap.loadFromData(get(self.info_data[0]['cover']).content)
-        else: pixmap = QtGui.QPixmap(f'{cwd}/res/no_cover.jpg')
+        else: pixmap = QtGui.QPixmap(f'{pwd}/res/no_cover.jpg')
         self.cover = QtWidgets.QLabel()
         self.cover.setPixmap(pixmap)
         self.cover.setMaximumSize(QtCore.QSize(190, 280))
@@ -218,7 +218,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.bookmark = QtWidgets.QCheckBox()
         self.bookmark.setCheckable(True)
         self.bookmark.setMaximumSize(QtCore.QSize(48, 48))
-        self.bookmark.setStyleSheet(f'QCheckBox::indicator:checked\n{{\nimage: url({cwd}/res/bookmark_white_48dp.svg);\n}}\nQCheckBox::indicator:unchecked\n{{\nimage: url({cwd}/res/bookmark_border_white_48dp.svg);\n}}')
+        self.bookmark.setStyleSheet(f'QCheckBox::indicator:checked\n{{\nimage: url({pwd}/res/bookmark_white_48dp.svg);\n}}\nQCheckBox::indicator:unchecked\n{{\nimage: url({pwd}/res/bookmark_border_white_48dp.svg);\n}}')
 
         self.info_pane_layout.addWidget(self.bookmark, 0, 2, 1, 1)
 
@@ -376,7 +376,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if len(i['cover']) > 1:
                 pixmap = QtGui.QPixmap()
                 pixmap.loadFromData(get(i['cover']).content)
-            else: pixmap = QtGui.QPixmap(f'{cwd}/res/no_cover.jpg')
+            else: pixmap = QtGui.QPixmap(f'{pwd}/res/no_cover.jpg')
             pixmap_rescale = pixmap.scaled(110, 150, QtCore.Qt.KeepAspectRatio) #120,170
             generated_cover.setIcon(QtGui.QIcon(pixmap_rescale))
             generated_cover.setIconSize(pixmap_rescale.rect().size())
