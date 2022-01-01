@@ -11,7 +11,7 @@ def fetchPopular(popular_url, popular_selector):
     try:
         request = r.get(popular_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
     popular = BeautifulSoup(request.text, 'html.parser')
 
     if popular_selector is None:
@@ -28,7 +28,7 @@ def fetchLatest(latest_url, latest_selector):
     try:
         request = r.get(latest_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
     latest = BeautifulSoup(request.text, 'html.parser')
 
     if latest_selector is None:
@@ -47,7 +47,7 @@ def fetchSearch(search_url, search_selector):
     try:
         request = r.get(search_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
 
     search = BeautifulSoup(request.text, 'html.parser')
 
@@ -60,7 +60,7 @@ def fetchDetails(novel_url):
     try:
         request = r.get(novel_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
 
     details = BeautifulSoup(request.text, 'html.parser')
     title = details.select_one('h3').get_text().replace('NEW', '').replace('HOT', '').lstrip().rstrip()
@@ -84,7 +84,7 @@ def fetchChapter(chapter_url):
     try:
         request = r.get(chapter_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
 
     chapter_body = BeautifulSoup(request.text, 'html5lib').select_one('div.text-left').findAll('p')
     chapter = ''.join(str(x) + '\n' for x in chapter_body)

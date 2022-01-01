@@ -152,6 +152,7 @@ class MainWindow(QtWidgets.QMainWindow):
         
         import textwrap as tw
         for i in data:
+            QtCore.QCoreApplication.processEvents()
             generated_cover = QtWidgets.QToolButton()
             if len(i['cover']) > 1:
                 pixmap = QtGui.QPixmap()
@@ -370,6 +371,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         import textwrap as tw
         for i in data:
+            QtCore.QCoreApplication.processEvents()
             generated_cover = QtWidgets.QToolButton()
             if len(i['cover']) > 1:
                 pixmap = QtGui.QPixmap()

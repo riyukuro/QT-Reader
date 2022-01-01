@@ -10,7 +10,7 @@ def fetchPopular():
     try:
         request = r.get(popular_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
 
     popular = BeautifulSoup(request.text, 'html.parser')
     popular_results = list()
@@ -24,7 +24,7 @@ def fetchLatest(): #No Covers
     try:
         request = r.get(latest_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
 
     latest = BeautifulSoup(request.text, 'html.parser')
     latest_results = list()
@@ -38,7 +38,7 @@ def fetchSearch(novel_name):
     try:
         request = r.get(search_url + novel_name, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
     search = BeautifulSoup(request.text, 'html.parser')
     search_results = list()
         
@@ -50,7 +50,7 @@ def fetchDetails(novel_url):
     try:
         request = r.get(novel_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
 
     novel = BeautifulSoup(request.text, 'html.parser')
     # Novel Details
@@ -64,7 +64,7 @@ def fetchDetails(novel_url):
     try:
         request = r.get(f'{base_url}/ajax-chapter-option?novelId={novelId}', headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
     
     chapter_list = BeautifulSoup(request.text, 'html.parser')
     chapter_list_results = list()
@@ -82,10 +82,8 @@ def fetchChapter(chapter_url):
     try:
         request = r.get(chapter_url, headers=header)
     except r.exceptions.RequestException as e:
-        raise SystemExit(e)
+        return e
 
-    chapter_body = BeautifulSoup(request.text, 'html5lib').find('div', id='chapter-content')
-    for strip in chapter_body(['script', 'ins']):
-        strip.extract()
-
-    return chapter_body
+    chapter_body = BeautifulSoup(request.text, 'html5lib').find('div', id='chapter-content').findAll('p')
+    chapter = ''.join(str(x) + '\n' for x in chapter_body)
+    return chapter
