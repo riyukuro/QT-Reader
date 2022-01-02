@@ -1,10 +1,14 @@
 import ui.ui_main as ui_main
 import ui.ui_util
+import util
 from PySide6 import QtCore, QtGui, QtWidgets
 
-from importlib import import_module
+
 from requests import get
 from os import path
+
+import textwrap as tw
+from importlib import import_module
 
 pwd = path.dirname(path.abspath(__file__))
 
@@ -127,6 +131,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.setWindowTitle(source_name + ' Latest')
 
     def browse_source(self, data, source):
+        if type(data) is list and len(data) == 0: return util.error_handler('Was unable to get any results.')
+        elif type(data) is not list: return util.error_handler(str(data))
+
         """ Generates the library layout page which generate_covers uses to add entries. """
         self.browse_library_page = QtWidgets.QWidget()
         self.browse_library_page.setObjectName('Library Page')
@@ -150,7 +157,7 @@ class MainWindow(QtWidgets.QMainWindow):
         page = self.ui.stackedWidget.findChild(QtWidgets.QWidget,'Library Page')
         self.ui.stackedWidget.setCurrentIndex(self.ui.stackedWidget.indexOf(page))
         
-        import textwrap as tw
+        
         for i in data:
             QtCore.QCoreApplication.processEvents()
             generated_cover = QtWidgets.QToolButton()
@@ -365,11 +372,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def search_results(self, title, source_name):
         if self.layout.count() != 0: self.layout.__del__()
 
-        from importlib import import_module
         source = import_module('sources.' + source_name)
         data = source.fetchSearch(str(title))
 
-        import textwrap as tw
+        if type(data) is list and len(data) == 0: return util.error_handler('Was unable to get any results.')
+        elif type(data) is not list: return util.error_handler(str(data))
+
         for i in data:
             QtCore.QCoreApplication.processEvents()
             generated_cover = QtWidgets.QToolButton()
@@ -396,4 +404,4 @@ if __name__ == "__main__":
     app.setPalette(ui.ui_util.palettes.dark_palette)
     window = MainWindow()
     window.setWindowTitle('LN Reader')
-    sys.exit(app.exec_())
+    sys.exit(app.exec())
